@@ -12,14 +12,21 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+// 
+// Route::get('/', function () {
+//     return view('home.index', []);
+// })->name ('home.index');
+//  above is equivalent to
 
-Route::get('/', function () {
-    return view('home.index', []);
-})->name ('home.index');
- 
-Route::get('/contact', function(){
-    return view('home.contact', []);
-})->name ('home.contact');
+Route::view('/', 'home.index')
+    ->name ('home.index');
+Route::view('/contact', 'home.contact')
+    ->name ('home.contact');
+
+
+// Route::get('/contact', function(){
+//     return view('home.contact', []);
+// })->name ('home.contact');
 
 // get specific post
 // Verification for a num happens in RouteServiceProvider
@@ -34,6 +41,8 @@ Route::get('/posts/{id}', function($id){
             'content' => 'This is a short intro to PHP'
         ]
     ];
+    // Abort if post is not found
+    abort_if(!isset($posts[$id]), 404);
     return view('posts.show', ['post' => $posts[$id]]);
 })->name ('posts.show');
 
