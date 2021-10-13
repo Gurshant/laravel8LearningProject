@@ -11,42 +11,52 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-*/
-// 
+ */
+//
 // Route::get('/', function () {
 //     return view('home.index', []);
 // })->name ('home.index');
 //  above is equivalent to
 
 Route::view('/', 'home.index')
-    ->name ('home.index');
+    ->name('home.index');
+
 Route::view('/contact', 'home.contact')
-    ->name ('home.contact');
+    ->name('home.contact');
 
-
-// Route::get('/contact', function(){
-//     return view('home.contact', []);
-// })->name ('home.contact');
+$posts = [
+    1 => [
+        'title' => 'Intro to Laravel',
+        'content' => 'This is a short intro to Laravel',
+        'is_new' => true,
+    ],
+    2 => [
+        'title' => 'Intro to PHP',
+        'content' => 'This is a short intro to PHP',
+        'is_new' => false,
+    ],
+];
 
 // get specific post
 // Verification for a num happens in RouteServiceProvider
-Route::get('/posts/{id}', function($id){
-    $posts = [
-        1 => [
-            'title' => 'Intro to Laravel',
-            'content' => 'This is a short intro to Laravel'
-        ],
-        2 => [
-            'title' => 'Intro to PHP',
-            'content' => 'This is a short intro to PHP'
-        ]
-    ];
+Route::get('/posts/{id}', function ($id) use ($posts) {
+
     // Abort if post is not found
     abort_if(!isset($posts[$id]), 404);
     return view('posts.show', ['post' => $posts[$id]]);
-})->name ('posts.show');
+})->name('posts.show');
+
+Route::get('/posts', function () use ($posts) {
+    return view('posts.index', ['posts' => $posts]);
+})->name('posts.index');
 
 // get with optional param
-Route::get('/recent-posts/{days_ago?}', function($daysAgo = 20){
+Route::get('/recent-posts/{days_ago?}', function ($daysAgo = 20) {
     return 'Posts from ' . $daysAgo . ' days ago';
-})->name ('posts.recent.index');
+})->name('posts.recent.index');
+
+Route::get('/fun/responses', function () use ($posts) {
+    return response($posts, 201)
+        ->header('Content-Type', 'application/json')
+        ->cookie('MY_COOKIE', 'P J', 3600);
+});
