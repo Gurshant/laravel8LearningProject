@@ -24,7 +24,17 @@ Route::get('/contact', function(){
 // get specific post
 // Verification for a num happens in RouteServiceProvider
 Route::get('/posts/{id}', function($id){
-    return 'Posts ' . $id;
+    $posts = [
+        1 => [
+            'title' => 'Intro to Laravel',
+            'content' => 'This is a short intro to Laravel'
+        ],
+        2 => [
+            'title' => 'Intro to PHP',
+            'content' => 'This is a short intro to PHP'
+        ]
+    ];
+    return view('posts.show', ['post' => $posts[$id]]);
 })->name ('posts.show');
 
 // get with optional param
