@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,10 +19,10 @@ use Illuminate\Support\Facades\Route;
 // })->name ('home.index');
 //  above is equivalent to
 
-Route::view('/', 'home.index')
+Route::get('/', [HomeController::class, 'home'])
     ->name('home.index');
 
-Route::view('/contact', 'home.contact')
+Route::get('/contact', [HomeController::class, 'contact'])
     ->name('home.contact');
 
 $posts = [
@@ -47,16 +48,33 @@ Route::get('/posts/{id}', function ($id) use ($posts) {
 })->name('posts.show');
 
 Route::get('/posts', function () use ($posts) {
+    // dd(request()->all());
+    dd((int) request()->input('page', 1));
     return view('posts.index', ['posts' => $posts]);
 })->name('posts.index');
 
 // get with optional param
 Route::get('/recent-posts/{days_ago?}', function ($daysAgo = 20) {
     return 'Posts from ' . $daysAgo . ' days ago';
-})->name('posts.recent.index');
+})->name('posts.recent.index')->middleware('auth');
 
-Route::get('/fun/responses', function () use ($posts) {
-    return response($posts, 201)
-        ->header('Content-Type', 'application/json')
-        ->cookie('MY_COOKIE', 'P J', 3600);
+// Group function fun
+Route::prefix('/fun')->name('fun.')->group(function () use ($posts) {
+
+    Route::get('/responses', function () use ($posts) {
+        return response($posts, 201)
+            ->header('Content-Type', 'application/json')
+            ->cookie('MY_COOKIE', 'P J', 3600);
+    })->name('responses');
+
+// redirect to posts.show[1]
+    Route::get('/redirect', function () {
+        return redirect()->route('posts.show', ['id' => 1]);
+    })->name('redirect');
+
+// go back
+    Route::get('/back', function () {
+        return back();
+    })->name('back');
+
 });
