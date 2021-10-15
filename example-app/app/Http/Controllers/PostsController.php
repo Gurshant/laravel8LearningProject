@@ -2,22 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePost;
+use App\Models\BlogPost;
 use Illuminate\Http\Request;
 
 class PostsController extends Controller
 {
-    private $posts = [
-        1 => [
-            'title' => 'Intro to Laravel',
-            'content' => 'This is a short intro to Laravel',
-            'is_new' => true,
-        ],
-        2 => [
-            'title' => 'Intro to PHP',
-            'content' => 'This is a short intro to PHP',
-            'is_new' => false,
-        ],
-    ];
 
     /**
      * Display a listing of the resource.
@@ -26,7 +16,7 @@ class PostsController extends Controller
      */
     public function index()
     {
-        return view('posts.index', ['posts' => $this->posts]);
+        return view('posts.index', ['posts' => BlogPost::all()]);
     }
 
     /**
@@ -37,6 +27,8 @@ class PostsController extends Controller
     public function create()
     {
         //
+        return view('posts.create');
+
     }
 
     /**
@@ -45,9 +37,17 @@ class PostsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StorePost $request)
     {
-        //
+        $validated = $request->validated();
+        // $post = new BlogPost();
+        // $post->title = $validated['title'];
+        // $post->content = $validated['content'];
+
+        $post = BlogPost::create($validated);
+
+        $post->save();
+        return redirect()->route('posts.show', [$post->id]);
     }
 
     /**
@@ -58,9 +58,8 @@ class PostsController extends Controller
      */
     public function show($id)
     {
-        //
-        abort_if(!isset($this->posts[$id]), 404);
-        return view('posts.show', ['post' => $this->posts[$id]]);
+        // abort_if(!isset($this->posts[$id]), 404);
+        return view('posts.show', ['post' => BlogPost::findOrFail($id)]);
     }
 
     /**
@@ -71,7 +70,7 @@ class PostsController extends Controller
      */
     public function edit($id)
     {
-        //
+        return view('posts.edit', ['post' => BlogPost::findOrFail($id)]);
     }
 
     /**
@@ -81,9 +80,13 @@ class PostsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(StorePost $request, $id)
     {
-        //
+        $post = BlogPost::findOrFail($id);
+        $validated = $request->validated();
+        $post->fill($validated);
+        $post->save();
+        return redirect()->route('posts.show', [$post->id]);
     }
 
     /**
@@ -94,6 +97,9 @@ class PostsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $post = BlogPost::findOrFail($id);
+        $post->delete();
+        return redirect()->route('posts.index');
+
     }
 }

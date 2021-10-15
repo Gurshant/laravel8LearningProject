@@ -46,7 +46,7 @@ Route::get('/about', AboutController::class)
 // })->name('posts.index');
 
 // Could also use except instead of only
-Route::resource('posts', PostsController::class)->only(['index', 'show']);
+Route::resource('posts', PostsController::class);
 
 // get with optional param
 Route::get('/recent-posts/{days_ago?}', function ($daysAgo = 20) {
